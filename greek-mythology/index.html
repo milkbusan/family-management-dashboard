@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6c63ff">
+<title>그리스로마 신화 퀴즈 어드벤처</title>
+<style>
+:root{--ink:#30264d;--muted:#746a8d;--gold:#f6c85f;--purple:#7567e8;--pink:#ef72b6;--sky:#e9f6ff;--card:#fffdf9;--line:#eadff4;--good:#64c889;--bad:#ef7777}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);background:linear-gradient(180deg,#dff4ff 0%,#f8edff 45%,#fff8e8 100%);min-height:100vh}
+button{font:inherit}.wrap{max-width:720px;margin:auto;padding:14px 14px 34px}.hero{position:relative;overflow:hidden;border:2px solid #fff;border-radius:28px;padding:24px 20px 20px;background:linear-gradient(135deg,#7d73ee,#a86fe0 55%,#f18ac0);box-shadow:0 12px 35px #6c4fa22b;color:white}.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:#ffffff22}.hero:before{width:170px;height:170px;right:-55px;top:-60px}.hero:after{width:100px;height:100px;left:-35px;bottom:-45px}.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;z-index:1}.badge{background:#ffffff2e;border:1px solid #ffffff66;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}.hero h1{font-size:30px;line-height:1.12;margin:18px 0 8px;position:relative;z-index:1}.hero p{margin:0;color:#fff9ff;line-height:1.5;position:relative;z-index:1}.stats{display:flex;gap:8px;margin-top:16px;position:relative;z-index:1}.stat{background:#fffdfc22;border:1px solid #ffffff44;border-radius:15px;padding:8px 12px;min-width:84px}.stat b{display:block;font-size:18px}.stat small{font-size:11px;color:#fff8ff}.tabs{display:flex;gap:8px;margin:14px 0}.tab{flex:1;border:1px solid var(--line);background:#ffffffc9;border-radius:15px;padding:12px 8px;font-weight:800;color:var(--muted);cursor:pointer}.tab.active{background:#fff;color:var(--purple);border-color:#bdb4ff;box-shadow:0 4px 12px #6c63ff18}.panel{background:#ffffffd9;border:1px solid #fff;border-radius:24px;padding:16px;box-shadow:0 10px 25px #5d487014}.stagebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.stage{font-weight:900;color:var(--purple)}.stars{letter-spacing:2px;color:#c9bfd5;font-size:20px}.stars .on{color:#f6bd3f;text-shadow:0 2px 0 #fff}.character{display:grid;grid-template-columns:145px 1fr;gap:14px;align-items:stretch}.portrait{border-radius:22px;min-height:175px;background:linear-gradient(160deg,#fff6c9,#e8dcff);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:2px solid #fff;box-shadow:inset 0 0 0 1px #eadcf8}.portrait .spark{position:absolute;font-size:18px;animation:float 2.6s ease-in-out infinite}.spark.s1{left:12px;top:18px}.spark.s2{right:12px;top:55px;animation-delay:.6s}.spark.s3{left:28px;bottom:18px;animation-delay:1.1s}.emoji{font-size:76px;filter:drop-shadow(0 8px 5px #6b4a6b25);transform:translateY(2px)}@keyframes float{50%{transform:translateY(-7px) rotate(5deg)}}.info h2{margin:2px 0 4px;font-size:24px}.info .role{color:var(--purple);font-weight:800;font-size:13px}.info p{color:var(--muted);font-size:13px;line-height:1.45;margin:8px 0}.pieces{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:10px}.piece{height:10px;border-radius:99px;background:#e6dfec}.piece.on{background:linear-gradient(90deg,#f6bd3f,#ef7cb8)}.question{margin-top:16px;border-top:1px dashed #e5d9ef;padding-top:16px}.qtag{font-size:12px;font-weight:900;color:#a07cbb}.question h3{font-size:19px;line-height:1.45;margin:7px 0 13px}.answers{display:grid;grid-template-columns:1fr 1fr;gap:9px}.answer{min-height:58px;text-align:left;border:2px solid #e8e0f1;background:#fff;border-radius:17px;padding:12px 13px;cursor:pointer;font-weight:750;color:var(--ink);transition:.15s}.answer:active{transform:scale(.98)}.answer:hover{border-color:#bcb1f4;background:#faf8ff}.answer.good{border-color:var(--good);background:#effbf4}.answer.bad{border-color:var(--bad);background:#fff1f1}.answer:disabled{cursor:default}.feedback{min-height:42px;margin-top:10px;border-radius:14px;padding:10px 12px;background:#f7f3ff;color:#5f5375;font-size:13px;line-height:1.45;display:none}.feedback.show{display:block}.next{width:100%;margin-top:10px;border:0;border-radius:16px;padding:13px;background:linear-gradient(90deg,#7667e8,#d46fc0);color:white;font-weight:900;cursor:pointer;display:none}.next.show{display:block}.collection{display:none}.collection.show{display:block}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.collect-card{background:#fff;border:1px solid var(--line);border-radius:19px;padding:12px;position:relative;overflow:hidden}.collect-card.locked{filter:saturate(.3);opacity:.68}.collect-card .mini{height:90px;border-radius:14px;background:linear-gradient(135deg,#fff5c9,#e9e1ff);display:flex;align-items:center;justify-content:center;font-size:50px}.collect-card b{display:block;margin-top:8px}.collect-card small{color:var(--muted)}.progress{height:8px;border-radius:99px;background:#eee7f2;margin-top:8px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#f6bd3f,#e96eb4);border-radius:inherit}.complete{color:#e28a25;font-size:12px;font-weight:900}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:#31274c;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:5;font-weight:800;font-size:13px;box-shadow:0 8px 24px #31274c44}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.intro{margin:12px 2px 0;color:var(--muted);font-size:12px;text-align:center}.restart{border:1px solid #e3d8ef;background:#fff;border-radius:12px;padding:8px 10px;color:var(--muted);font-weight:800;cursor:pointer}.hidden{display:none!important}@media(max-width:520px){.hero h1{font-size:26px}.character{grid-template-columns:115px 1fr}.portrait{min-height:150px}.emoji{font-size:62px}.info h2{font-size:21px}.question h3{font-size:18px}.answers{grid-template-columns:1fr}.wrap{padding:10px 10px 28px}.grid{grid-template-columns:1fr 1fr}}@media(max-width:350px){.character{grid-template-columns:1fr}.portrait{min-height:120px}.pieces{max-width:300px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="hero">
+<div class="topline"><span class="badge">🏛️ 올림포스 탐험대</span><button class="restart" id="resetBtn">처음부터</button></div>
+<h1>그리스로마<br>신화 퀴즈 어드벤처 ✨</h1>
+<p>퀴즈를 맞히고 퍼즐 조각을 모아<br>신화 속 멋진 캐릭터를 완성해 보세요!</p>
+<div class="stats"><div class="stat"><b id="score">0</b><small>⭐ 별</small></div><div class="stat"><b id="completed">0/5</b><small>🏆 완성</small></div><div class="stat"><b id="streak">0</b><small>🔥 연속 정답</small></div></div>
+</section>
+
+<div class="tabs"><button class="tab active" id="quizTab">🎯 퀴즈</button><button class="tab" id="collectionTab">📖 나의 신화 컬렉션</button></div>
+
+<section class="panel" id="quizPanel">
+<div class="stagebar"><span class="stage" id="stageLabel">1단계 · 제우스</span><span class="stars" id="starDisplay">☆☆☆</span></div>
+<div class="character">
+<div class="portrait" id="portrait"><span class="spark s1">✦</span><span class="spark s2">✧</span><span class="spark s3">✦</span><span class="emoji" id="emoji">⚡</span></div>
+<div class="info"><h2 id="charName">제우스</h2><div class="role" id="charRole">하늘과 천둥의 신</div><p id="charDesc">올림포스의 신들을 이끄는 강력한 신이에요.</p><div class="pieces" id="pieces"></div></div>
+</div>
+<div class="question"><div class="qtag" id="qCount">QUEST 1 / 30</div><h3 id="questionText"></h3><div class="answers" id="answers"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="next" id="nextBtn">다음 퀴즈로 가기 →</button></div>
+</section>
+
+<section class="panel collection" id="collectionPanel">
+<div class="stagebar"><span class="stage">✨ 나의 신화 컬렉션</span><b id="collectionCount">0 / 5</b></div>
+<p class="intro" style="text-align:left;margin:0 0 12px">캐릭터를 완성할수록 멋진 신화 이야기가 열려요!</p>
+<div class="grid" id="collectionGrid"></div>
+</section>
+
+<p class="intro">초등학교 저학년용 · 신화 속 사실을 재미있게 배우는 퀴즈</p>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const characters=[
+{name:'제우스',role:'하늘과 천둥의 신',desc:'올림포스의 신들을 이끄는 강력한 신이에요.',emoji:'⚡',color:'#fff0a8',story:'제우스는 번개를 다루며 올림포스의 신들을 이끄는 신이에요.'},
+{name:'포세이돈',role:'바다의 신',desc:'삼지창을 들고 바다를 다스리는 신이에요.',emoji:'🌊',color:'#b9edff',story:'포세이돈은 바다와 지진을 관장하며 삼지창이 대표적인 상징이에요.'},
+{name:'아테나',role:'지혜와 전략의 여신',desc:'지혜롭게 생각하고 용감하게 행동하는 여신이에요.',emoji:'🦉',color:'#e8d8ff',story:'아테나는 지혜와 전략의 여신이며 부엉이와 올리브나무가 유명한 상징이에요.'},
+{name:'아폴론',role:'빛과 음악의 신',desc:'음악과 예언, 빛과 관련된 아름다운 신이에요.',emoji:'☀️',color:'#ffe6a8',story:'아폴론은 음악과 예언 등 여러 영역과 관련된 올림포스의 신이에요.'},
+{name:'아프로디테',role:'사랑과 아름다움의 여신',desc:'아름다움과 사랑을 상징하는 여신이에요.',emoji:'💗',color:'#ffd1e7',story:'아프로디테는 사랑과 아름다움의 여신으로 장미와 비둘기 등이 상징으로 알려져 있어요.'}
+];
+const qs=[
+{c:0,q:'제우스는 어떤 신으로 가장 잘 알려져 있을까요?',a:['바다와 파도의 신','하늘과 천둥의 신','음악과 예언의 신','사랑과 아름다움의 신'],k:1},
+{c:0,q:'제우스를 상징하는 무기로 유명한 것은 무엇일까요?',a:['삼지창','활','번개','망치'],k:2},
+{c:0,q:'그리스 신화에서 제우스가 신들을 이끄는 산으로 유명한 곳은?',a:['올림포스 산','아틀라스 산','에베레스트 산','후지산'],k:0},
+{c:0,q:'제우스의 형제이면서 바다를 다스리는 신은 누구일까요?',a:['아폴론','아레스','포세이돈','헤르메스'],k:2},
+{c:0,q:'제우스의 상징으로 자주 등장하는 새는 무엇일까요?',a:['독수리','펭귄','타조','앵무새'],k:0},
+{c:0,q:'제우스가 사용하는 대표적인 무기는 무엇일까요?',a:['황금 사과','번개','삼지창','리라'],k:1},
+{c:1,q:'포세이돈은 어떤 영역을 다스리는 신일까요?',a:['바다','숲','음악','사랑'],k:0},
+{c:1,q:'포세이돈이 들고 있는 것으로 유명한 것은?',a:['리라','삼지창','번개','왕관'],k:1},
+{c:1,q:'포세이돈과 가장 잘 어울리는 동물은 무엇일까요?',a:['말','부엉이','사자','백조'],k:0},
+{c:1,q:'포세이돈은 제우스와 어떤 관계일까요?',a:['형제','스승과 제자','아버지와 아들','친구'],k:0},
+{c:1,q:'포세이돈은 바다뿐 아니라 무엇과도 관련된 신으로 알려져 있을까요?',a:['지진','음악','무지개','농업'],k:0},
+{c:1,q:'포세이돈의 대표적인 무기는 무엇일까요?',a:['삼지창','방패','활과 화살','망치'],k:0},
+{c:2,q:'아테나는 어떤 것을 상징하는 여신일까요?',a:['지혜와 전략','바다와 폭풍','불과 대장간','농업과 수확'],k:0},
+{c:2,q:'아테나를 상징하는 새로 유명한 것은?',a:['독수리','부엉이','공작','백조'],k:1},
+{c:2,q:'아테나와 관련된 나무로 유명한 것은?',a:['사과나무','소나무','올리브나무','벚나무'],k:2},
+{c:2,q:'아테나는 어떤 도시의 수호신으로 특히 유명할까요?',a:['아테네','스파르타','로마','트로이'],k:0},
+{c:2,q:'아테나가 전쟁에서 중요하게 여기는 것은?',a:['무조건 힘으로 싸우기','전략과 지혜','노래와 춤','보물 모으기'],k:1},
+{c:2,q:'아테나의 대표적인 방패와 함께 자주 그려지는 무기는?',a:['창','삼지창','번개','리라'],k:0},
+{c:3,q:'아폴론은 무엇과 관련된 신일까요?',a:['음악과 예언','바다와 지진','대장간과 불','사랑과 결혼'],k:0},
+{c:3,q:'아폴론이 연주하는 악기로 유명한 것은?',a:['리라','북','피아노','트럼펫'],k:0},
+{c:3,q:'아폴론과 관련된 동물로 자주 알려진 것은?',a:['돌고래','까마귀','호랑이','팬더'],k:1},
+{c:3,q:'아폴론은 어떤 활동과도 관련이 깊을까요?',a:['궁술','요리','항해','농사'],k:0},
+{c:3,q:'아폴론의 이미지에서 자주 볼 수 있는 밝은 상징은?',a:['달빛','태양빛','눈보라','안개'],k:1},
+{c:3,q:'아폴론과 쌍둥이 남매로 알려진 여신은 누구일까요?',a:['아테나','아르테미스','헤라','아프로디테'],k:1},
+{c:4,q:'아프로디테는 어떤 여신일까요?',a:['사랑과 아름다움의 여신','바다와 지진의 여신','지혜와 전략의 여신','농업과 수확의 여신'],k:0},
+{c:4,q:'아프로디테와 잘 어울리는 상징은 무엇일까요?',a:['장미','번개','삼지창','망치'],k:0},
+{c:4,q:'아프로디테의 이름을 들으면 가장 먼저 떠올릴 수 있는 것은?',a:['사랑','천둥','전쟁','대장간'],k:0},
+{c:4,q:'아프로디테의 상징으로 알려진 새는 무엇일까요?',a:['비둘기','독수리','부엉이','까마귀'],k:0},
+{c:4,q:'아프로디테는 어떤 아름다움과 특히 관련이 있을까요?',a:['사랑과 아름다움','전쟁과 승리','바다와 폭풍','농업과 수확'],k:0},
+{c:4,q:'아프로디테를 상징하는 것으로 알려진 꽃은 무엇일까요?',a:['장미','해바라기','튤립','국화'],k:0}
+];
+let state={index:0,score:0,streak:0,firstTry:true,pieces:[0,0,0,0,0],done:[false,false,false,false,false]};
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem('greekQuizState',JSON.stringify(state))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem('greekQuizState'));if(s&&Array.isArray(s.pieces)&&s.pieces.length===5)state=s}catch(e){}}
+function render(){
+const q=qs[state.index], ch=characters[q.c];
+$('stageLabel').textContent=(q.c+1)+'단계 · '+ch.name;
+$('qCount').textContent='QUEST '+(state.index+1)+' / '+qs.length;
+$('charName').textContent=ch.name;$('charRole').textContent=ch.role;$('charDesc').textContent=ch.desc;$('emoji').textContent=ch.emoji;
+$('portrait').style.background='linear-gradient(160deg,'+ch.color+',#e9e1ff)';
+$('questionText').textContent=q.q;
+$('score').textContent=state.score;$('completed').textContent=state.done.filter(Boolean).length+'/5';$('streak').textContent=state.streak;
+$('feedback').className='feedback';$('feedback').textContent='';$('nextBtn').className='next';
+$('starDisplay').innerHTML=[0,1,2].map(i=>'<span class="'+(state.pieces[q.c]>i?'on':'')+'">★</span>').join('');
+$('pieces').innerHTML=Array.from({length:6},(_,i)=>'<span class="piece '+(state.pieces[q.c]>i?'on':'')+'"></span>').join('');
+$('answers').innerHTML='';
+q.a.forEach((x,i)=>{const b=document.createElement('button');b.className='answer';b.type='button';b.textContent=x;b.addEventListener('click',()=>answer(i,b));$('answers').appendChild(b)});
+renderCollection();
+}
+function answer(i,btn){
+const q=qs[state.index];const all=[...$('answers').children];all.forEach(b=>b.disabled=true);
+if(i===q.k){
+btn.classList.add('good');state.score++;state.streak++;
+if(state.firstTry){state.pieces[q.c]=Math.min(6,state.pieces[q.c]+1);if(state.pieces[q.c]===6)state.done[q.c]=true}
+$('feedback').textContent='🎉 정답이에요! 퍼즐 조각을 하나 얻었어요. 다음 모험으로 가볼까요?';
+$('feedback').className='feedback show';$('nextBtn').className='next show';save();
+}else{
+btn.classList.add('bad');state.streak=0;
+$('feedback').textContent='아쉽지만 다시 생각해 볼 수 있어요! 힌트: '+hintFor(q);
+$('feedback').className='feedback show';
+state.firstTry=false;
+setTimeout(()=>{all.forEach(b=>b.disabled=false);btn.classList.remove('bad')},450);
+save();
+}}
+function hintFor(q){
+if(q.c===0)return '올림포스의 가장 높은 곳과 하늘을 떠올려 보세요.';
+if(q.c===1)return '푸른 바다와 거대한 파도를 떠올려 보세요.';
+if(q.c===2)return '현명하게 생각하고 전략을 세우는 여신이에요.';
+if(q.c===3)return '음악을 연주하는 신의 모습을 떠올려 보세요.';
+return '사랑과 아름다운 것들을 떠올려 보세요.';
+}
+$('nextBtn').addEventListener('click',()=>{
+state.index=(state.index+1)%qs.length;state.firstTry=true;save();render();
+if(state.index===0)toast('30문제를 모두 돌아봤어요! 다시 도전해 보세요 🎉');
+});
+function renderCollection(){
+$('collectionCount').textContent=state.done.filter(Boolean).length+' / 5';
+$('collectionGrid').innerHTML='';
+characters.forEach((c,i)=>{
+const n=state.pieces[i], card=document.createElement('div');card.className='collect-card '+(n===6?'':'locked');
+card.innerHTML='<div class="mini">'+(n>0?c.emoji:'❔')+'</div><b>'+c.name+'</b><small>'+c.role+'</small><div class="progress"><i style="width:'+Math.round(n/6*100)+'%"></i></div><small>'+n+'/6 퍼즐 조각 '+(n===6?'<span class="complete">· 완성!</span>':'')+'</small>';
+card.addEventListener('click',()=>{if(n===6)toast(c.name+' · '+c.story);else toast((6-n)+'조각을 더 모으면 이야기가 열려요!')});$('collectionGrid').appendChild(card);
+});
+}
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.remove('show'),1900)}
+$('quizTab').addEventListener('click',()=>{$('quizTab').classList.add('active');$('collectionTab').classList.remove('active');$('quizPanel').style.display='block';$('collectionPanel').classList.remove('show')});
+$('collectionTab').addEventListener('click',()=>{$('collectionTab').classList.add('active');$('quizTab').classList.remove('active');$('quizPanel').style.display='none';$('collectionPanel').classList.add('show');renderCollection()});
+$('resetBtn').addEventListener('click',()=>{if(confirm('처음부터 다시 시작할까요? 지금까지 모은 별과 퍼즐이 모두 사라져요.')){state={index:0,score:0,streak:0,firstTry:true,pieces:[0,0,0,0,0],done:[false,false,false,false,false]};save();render();toast('새 모험을 시작해요! ✨')}});
+load();render();
+})();
+</script>
+</body>
+</html>
