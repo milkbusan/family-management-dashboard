@@ -170,6 +170,20 @@ function renderApp() {
     };
   });
 
+  const goInput = document.querySelector('#go-input');
+  if (goInput) goInput.onclick = async () => {
+    activeTab = 'input';
+    currentRecord = await loadDailyRecord(selectedDate);
+    renderApp();
+  };
+
+  const changeDate = document.querySelector('#change-date');
+  if (changeDate) changeDate.onclick = () => {
+    activeTab = 'input';
+    renderApp();
+    document.querySelector('#record-date')?.showPicker?.();
+  };
+
   if (activeTab === 'input') bindInput();
 }
 
