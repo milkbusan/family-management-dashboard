@@ -113,7 +113,15 @@ qs.push(
 [4,'아프로디테의 대표적인 상징물로 알려진 것은?',['거울','삼지창','번개','투구'],0],
 [4,'아프로디테와 자주 함께 등장하는 새는?',['비둘기','독수리','까마귀','올빼미'],0]
 );
-const TOTAL_QUESTIONS=qs.length;\nlet state={q:0,score:0,streak:0,stars:[0,0,0,0,0],answered:false};const $=id=>document.getElementById(id);
+const TOTAL_QUESTIONS=qs.length;
+function nextQuestionIndex(){
+ const charIndex=qs[state.q][0];
+ const indices=[];
+ qs.forEach((item,index)=>{if(item[0]===charIndex)indices.push(index)});
+ const current=indices.indexOf(state.q);
+ return indices[(current+1)%indices.length];
+}
+let state={q:0,score:0,streak:0,stars:[0,0,0,0,0],answered:false};const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('greekQuizState',JSON.stringify(state))}function load(){try{let s=JSON.parse(localStorage.getItem('greekQuizState'));if(s&&s.stars)state={...state,...s}}catch(e){}}
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(id==='map')renderMap();if(id==='collectionScreen')renderCollection()}
 const charImages=[
@@ -136,11 +144,13 @@ function answer(i,b){if(state.answered)return;let x=qs[state.q],all=[...$('answe
 function showReward(i){let n=state.stars[i];$('rewardArt').innerHTML=art(i,n);$('rewardName').textContent=chars[i].name;$('rewardBar').style.width=(n/6*100)+'%';$('rewardCount').textContent=n+' / 6 ⭐';show('rewardScreen')}
 function renderCollection(){$('colStars').textContent=state.stars.reduce((a,b)=>a+b,0);$('collectionGrid').innerHTML='';chars.forEach((c,i)=>{let n=state.stars[i],d=document.createElement('div');d.className='ccard '+(n?'':'lock');d.innerHTML='<div class="pic">'+(n?art(i,n):art(i,0))+'</div><b>'+c.name+'</b><small>'+n+'/6 ⭐</small><div class="pbar"><i style="width:'+(n/6*100)+'%"></i></div>';d.onclick=()=>n===6?showStory(i):toast((6-n)+'개의 별을 더 모아보세요!');$('collectionGrid').appendChild(d)})}
 function showStory(i){$('storyPic').innerHTML=art(i,6);$('storyRibbon').textContent=chars[i].role;$('storyName').textContent=chars[i].name;$('storyText').textContent=chars[i].story;show('storyScreen')}
-function resetGame(){if(confirm('지금까지의 별과 진행 상황을 모두 초기화할까요?')){localStorage.removeItem('greekQuizState');state={q:0,score:0,streak:0,stars:[0,0,0,0,0],answered:false};show('home')}}\nfunction toast(t){let e=$('feedback');if(e){e.textContent=t;e.className='feedback show';setTimeout(()=>e.className='feedback',1500)}}
+function resetGame(){if(confirm('지금까지의 별과 진행 상황을 모두 초기화할까요?')){localStorage.removeItem('greekQuizState');state={q:0,score:0,streak:0,stars:[0,0,0,0,0],answered:false};show('home')}}
+function toast(t){let e=$('feedback');if(e){e.textContent=t;e.className='feedback show';setTimeout(()=>e.className='feedback',1500)}}
 $('hero1').innerHTML=art(3,6);$('hero2').innerHTML=art(0,6);$('hero3').innerHTML=art(4,6);
 $('start').onclick=()=>show('map');$('homeReset').onclick=resetGame;$('collectionReset').onclick=resetGame;document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>show(b.dataset.back));$('toCollection').onclick=()=>show('collectionScreen');$('quizCollection').onclick=()=>show('collectionScreen');$('quizBack').onclick=()=>show('map');
 document.querySelectorAll('.island').forEach(el=>el.onclick=()=>{state.q=qs.findIndex(x=>x[0]===+el.dataset.char);state.answered=false;show('quizScreen');renderQuiz()});
-$('next').onclick=()=>{state.q=(state.q+1)%TOTAL_QUESTIONS;state.answered=false;save();show('quizScreen');renderQuiz()};$('rewardNext').onclick=()=>{state.q=(state.q+1)%30;state.answered=false;show('quizScreen');renderQuiz()};$('rewardCollection').onclick=()=>show('collectionScreen');$('storyNext').onclick=()=>show('collectionScreen');
+function goNextQuestion(){state.q=nextQuestionIndex();state.answered=false;save();show('quizScreen');renderQuiz()}
+$('next').onclick=goNextQuestion;$('rewardNext').onclick=goNextQuestion;$('rewardCollection').onclick=()=>show('collectionScreen');$('storyNext').onclick=()=>show('collectionScreen');
 load();renderMap();
 })();
 </script></body></html>
