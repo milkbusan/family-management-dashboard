@@ -401,3 +401,28 @@ footer { text-align:center; color:#9ca3af; font-size:12px; padding-top:22px; }
 .responsibility-fields {
   margin-top:0;
 }
+
+/* Large, touch-friendly choices and readable period summaries */
+.field-label { font-size:14px; font-weight:700; margin:12px 0 7px; }
+.meal-form h3 { font-size:17px; margin:0 0 12px; }
+.meal-form input[data-field="menu"] { font-size:16px; padding:12px; margin-top:10px; }
+.choice-group { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.choice-group:has(button:nth-child(2):last-child) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.choice { min-height:48px; padding:8px 4px; color:#374151; background:#f3f4f6; border:2px solid transparent; font-size:15px; }
+.choice.selected { background:#e8efff; border-color:#315bbc; color:#173b91; }
+.choice:focus-visible,.counter button:focus-visible { outline:3px solid #315bbc; outline-offset:2px; }
+.counter-list { display:grid; gap:8px; }
+.counter { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:15px; font-weight:700; }
+.counter-controls { display:flex; align-items:center; gap:8px; }
+.counter button { width:42px; height:42px; padding:0; background:#edf1fa; color:#173b91; font-size:23px; }
+.counter output { min-width:24px; text-align:center; font-size:18px; }
+.overview-card { margin-bottom:10px; }
+.day-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; }
+.day-cell { min-height:45px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:9px; background:#f3f4f6; color:#9ca3af; font-size:14px; }
+.day-cell.has-record { background:#dce8ff; color:#17418f; font-weight:700; }
+.day-cell b { line-height:1; font-size:13px; }
+.overview-caption { margin:10px 0 0; color:#6b7280; font-size:13px; }
+.bar-row > div:first-child,.bar-row b,.issue-line,.issue-line b,.history-row span,.history-row b,.result-insight b { font-size:14px; }
+.card-unit,.empty-text,.result-insight p { font-size:13px; }
+.metrics span { font-size:13px; }
+.result-metrics small { font-size:12px; }

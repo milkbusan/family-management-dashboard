@@ -180,6 +180,14 @@ function mealSummary(meal) {
   return parts.length ? parts.join(' · ') : '기록 없음';
 }
 
+function mealChoices(key, field, options, selected, label) {
+  return `<div class="choice-group" role="group" aria-label="${label}">${options.map(option => `<button type="button" class="choice ${selected === option ? 'selected' : ''}" data-meal-choice="${key}" data-choice="${field}" data-value="${option}" aria-pressed="${selected === option}">${option}</button>`).join('')}</div><input type="hidden" data-meal="${key}" data-field="${field}" value="${esc(selected || '')}" />`;
+}
+
+function counter(id, label, value) {
+  return `<div class="counter"><span>${label}</span><div class="counter-controls"><button type="button" data-step="${id}" data-delta="-1" aria-label="${label} 줄이기">−</button><output id="${id}-display">${Number(value || 0)}</output><button type="button" data-step="${id}" data-delta="1" aria-label="${label} 늘리기">+</button><input id="${id}" type="hidden" value="${Number(value || 0)}" /></div></div>`;
+}
+
 function collectStats(rows) {
   const stats = {
     days: rows.length,
@@ -282,6 +290,9 @@ async function renderResult() {
   const stats = collectStats(rows);
   const totalMealTypes = Object.values(stats.mealTypes).reduce((a,b) => a+b, 0);
   const mealPercent = type => totalMealTypes ? Math.round(stats.mealTypes[type] / totalMealTypes * 100) : 0;
+  const recorded = new Set(rows.map(row => row.record_date));
+  const dateCount = Math.round((parseDate(range.end) - parseDate(range.start)) / 86400000) + 1;
+  const dates = Array.from({ length: dateCount }, (_, i) => addDays(range.start, i));
 
   return `
     <section class="result-page">
@@ -309,13 +320,19 @@ async function renderResult() {
         </div>
       </section>
 
+      <section class="result-card overview-card">
+        <div class="result-card-head"><span>🗓️</span><strong>기록한 날</strong><span class="card-unit">${stats.days} / ${dateCount}일</span></div>
+        <div class="day-grid">${dates.map(date => `<div class="day-cell ${recorded.has(date) ? 'has-record' : ''}" title="${formatDate(date)}"><span>${resultPeriod === 'week' ? ['일','월','화','수','목','금','토'][parseDate(date).getDay()] : parseDate(date).getDate()}</span><b>${recorded.has(date) ? '●' : '·'}</b></div>`).join('')}</div>
+        <p class="overview-caption">진한 표시가 있는 날에 기록이 있습니다.</p>
+      </section>
+
       <section class="analytics-grid">
         <article class="result-card meal-analysis">
           <div class="result-card-head"><span>🍴</span><strong>식사 유형</strong><span class="card-unit">${stats.meals}회</span></div>
           <div class="bar-list">
             ${['집밥','외식','배달','간편식'].map(type => `
               <div class="bar-row">
-                <div><span>${type}</span><b>${stats.mealTypes[type]}</b></div>
+                <div><span>${type}</span><b>${stats.mealTypes[type]}회 · ${mealPercent(type)}%</b></div>
                 <div class="bar-track"><i style="width:${mealPercent(type)}%"></i></div>
               </div>`).join('')}
           </div>
@@ -367,27 +384,14 @@ function renderInput() {
             const isOut = m.type === '외식';
             return `<div class="meal-form">
               <h3>${label}</h3>
-              <select data-meal="${key}" data-field="type" class="meal-type">
-                <option value="">식사 형태를 선택하세요</option>
-                <option ${m.type === '집밥' ? 'selected' : ''}>집밥</option>
-                <option ${m.type === '외식' ? 'selected' : ''}>외식</option>
-                <option ${m.type === '배달' ? 'selected' : ''}>배달</option>
-                <option ${m.type === '간편식' ? 'selected' : ''}>간편식</option>
-              </select>
+              <div class="field-label">식사 형태</div>
+              ${mealChoices(key, 'type', ['집밥','외식','배달','간편식'], m.type, `${label} 식사 형태`)}
               <input data-meal="${key}" data-field="menu" value="${esc(m.menu || '')}" placeholder="${isOut ? '외식 메뉴 / 식당명' : '메뉴'}" />
               <div class="responsibility-fields" data-responsibility="${key}" style="${isOut ? 'display:none' : ''}">
-                <div class="two-col">
-                  <select data-meal="${key}" data-field="preparedBy">
-                    <option value="">준비 담당</option>
-                    <option ${m.preparedBy === '엄마' ? 'selected' : ''}>엄마</option>
-                    <option ${m.preparedBy === '아빠' ? 'selected' : ''}>아빠</option>
-                  </select>
-                  <select data-meal="${key}" data-field="cookedBy">
-                    <option value="">요리 담당</option>
-                    <option ${m.cookedBy === '엄마' ? 'selected' : ''}>엄마</option>
-                    <option ${m.cookedBy === '아빠' ? 'selected' : ''}>아빠</option>
-                  </select>
-                </div>
+                <div class="field-label">준비한 사람</div>
+                ${mealChoices(key, 'preparedBy', ['엄마','아빠'], m.preparedBy, `${label} 준비한 사람`)}
+                <div class="field-label">요리한 사람</div>
+                ${mealChoices(key, 'cookedBy', ['엄마','아빠'], m.cookedBy, `${label} 요리한 사람`)}
               </div>
             </div>`;
           }).join('')}
@@ -400,10 +404,10 @@ function renderInput() {
 
         <section class="input-card">
           <div class="section-title">📝 생활 기록</div>
-          <div class="three-col">
-            <label>부부 이슈<input id="conflict" type="number" min="0" value="${Number(currentRecord?.issue?.conflict || 0)}" /></label>
-            <label>외식 횟수<input id="eating-out" type="number" min="0" value="${Number(currentRecord?.issue?.eatingOut || 0)}" /></label>
-            <label>야간 외출<input id="late-night" type="number" min="0" value="${Number(currentRecord?.issue?.lateNight || 0)}" /></label>
+          <div class="counter-list">
+            ${counter('conflict', '부부 이슈', currentRecord?.issue?.conflict)}
+            ${counter('eating-out', '외식 횟수', currentRecord?.issue?.eatingOut)}
+            ${counter('late-night', '야간 외출', currentRecord?.issue?.lateNight)}
           </div>
           <textarea id="issue-note" rows="2" placeholder="생활 기록 메모">${esc(currentRecord?.issue?.note || '')}</textarea>
         </section>
@@ -438,11 +442,29 @@ function bindInput() {
     await renderApp();
   });
 
-  document.querySelectorAll('.meal-type').forEach(select => {
-    select.addEventListener('change', e => {
-      const key = e.target.dataset.meal;
+  document.querySelectorAll('[data-meal-choice]').forEach(button => {
+    button.addEventListener('click', e => {
+      const key = e.currentTarget.dataset.mealChoice;
+      const field = e.currentTarget.dataset.choice;
+      const value = e.currentTarget.dataset.value;
+      const input = document.querySelector(`[data-meal="${key}"][data-field="${field}"]`);
+      input.value = input.value === value ? '' : value;
+      e.currentTarget.parentElement.querySelectorAll('button').forEach(btn => {
+        const selected = btn.dataset.value === input.value;
+        btn.classList.toggle('selected', selected);
+        btn.setAttribute('aria-pressed', String(selected));
+      });
       const box = document.querySelector(`[data-responsibility="${key}"]`);
-      if (box) box.style.display = e.target.value === '외식' ? 'none' : '';
+      if (field === 'type' && box) box.style.display = input.value === '외식' ? 'none' : '';
+    });
+  });
+
+  document.querySelectorAll('[data-step]').forEach(button => {
+    button.addEventListener('click', () => {
+      const id = button.dataset.step;
+      const input = document.getElementById(id);
+      input.value = Math.max(0, Number(input.value) + Number(button.dataset.delta));
+      document.getElementById(`${id}-display`).textContent = input.value;
     });
   });
 
