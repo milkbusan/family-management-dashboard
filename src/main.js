@@ -97,7 +97,7 @@ function localRows(start, end) {
     const key = localStorage.key(i);
     if (!key?.startsWith(RECORD_PREFIX)) continue;
     const date = key.slice(RECORD_PREFIX.length);
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || date < start || date > end) continue;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < start || date > end) continue;
     const data = readLocal(date);
     if (data) rows.push({ record_date: date, data });
   }
