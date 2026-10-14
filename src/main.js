@@ -80,39 +80,79 @@ function slotsForDate(date) {
     : [['dinner', '평일 저녁']];
 }
 
-async function loadDailyRecord(date) {
-  if (!supabase) return blankRecord();
-  const { data, error } = await supabase.from('daily_records').select('data').eq('record_date', date).maybeSingle();
-  if (error) {
-    console.error(error);
-    return blankRecord();
+
+const RECORD_PREFIX = 'family-os-daily-v1:';
+function readLocal(date) {
+  try {
+    const raw = localStorage.getItem(RECORD_PREFIX + date);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) { console.error(error); return null; }
+}
+function writeLocal(date, record) {
+  localStorage.setItem(RECORD_PREFIX + date, JSON.stringify(record));
+}
+function localRows(start, end) {
+  const rows = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith(RECORD_PREFIX)) continue;
+    const date = key.slice(RECORD_PREFIX.length);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < start || date > end) continue;
+    const data = readLocal(date);
+    if (data) rows.push({ record_date: date, data });
   }
+  return rows;
+}
+async function loadDailyRecord(date) {
+  const local = readLocal(date);
+  if (local) return local;
+  if (!supabase || !currentUser) return blankRecord();
+  const { data, error } = await supabase.from('daily_records').select('data').eq('record_date', date).maybeSingle();
+  if (error) { console.error(error); return blankRecord(); }
+  if (data?.data) writeLocal(date, data.data);
   return data?.data || blankRecord();
 }
-
 async function loadRecords(start, end) {
-  if (!supabase) return [];
-  const { data, error } = await supabase
-    .from('daily_records')
-    .select('record_date,data')
-    .gte('record_date', start)
-    .lte('record_date', end)
-    .order('record_date', { ascending: true });
-  if (error) {
-    console.error(error);
-    return [];
+  const rows = new Map(localRows(start, end).map(row => [row.record_date, row]));
+  if (supabase && currentUser) {
+    const { data, error } = await supabase.from('daily_records').select('record_date,data')
+      .gte('record_date', start).lte('record_date', end).order('record_date', { ascending: true });
+    if (error) console.error(error);
+    else (data || []).forEach(row => {
+      if (!rows.has(row.record_date)) {
+        writeLocal(row.record_date, row.data);
+        rows.set(row.record_date, row);
+      }
+    });
   }
-  return data || [];
+  return [...rows.values()].sort((a,b) => a.record_date.localeCompare(b.record_date));
 }
-
+async function migrateExistingRecords() {
+  if (!supabase || !currentUser) return 0;
+  let imported = 0;
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await supabase.from('daily_records')
+      .select('record_date,data').order('record_date', { ascending: true }).range(offset, offset + 999);
+    if (error) { console.error('과거 기록을 가져오지 못했습니다.', error); break; }
+    for (const row of data || []) {
+      if (!readLocal(row.record_date) && row.data) {
+        writeLocal(row.record_date, row.data);
+        imported++;
+      }
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return imported;
+}
 async function saveDailyRecord(date, record) {
-  if (!supabase || !currentUser) return;
-  const { error } = await supabase.from('daily_records').upsert({
-    record_date: date,
-    data: record,
-    created_by: currentUser.id
-  }, { onConflict: 'record_date' });
-  if (error) throw error;
+  // Device-local saving works even without a login or a Supabase connection.
+  writeLocal(date, record);
+  if (supabase && currentUser) {
+    const { error } = await supabase.from('daily_records').upsert({
+      record_date: date, data: record, created_by: currentUser.id
+    }, { onConflict: 'record_date' });
+    if (error) console.error('클라우드 백업 실패 (기기 저장 완료)', error);
+  }
 }
 
 function parseDate(date) {
@@ -237,8 +277,6 @@ async function renderDashboard() {
 }
 
 async function renderApp() {
-  const admin = profile?.role === 'admin';
-
   app.innerHTML = `
     <main class="app-shell">
       <header class="app-header">
@@ -247,13 +285,7 @@ async function renderApp() {
           <h1>가족경영 대시보드</h1>
           <p>가족의 일정·식사·생활 기록을 한 곳에서 관리합니다.</p>
         </div>
-        <button id="logout" class="small-button">로그아웃</button>
       </header>
-
-      <section class="user-strip">
-        <span>🔐 ${esc(profile?.display_name || currentUser?.email || '')}</span>
-        <span>${admin ? '관리자' : '가족 구성원'}</span>
-      </section>
 
       <nav class="tabs">
         <button class="${activeTab === 'result' ? 'active' : ''}" data-tab="result">📊 결과</button>
@@ -261,16 +293,8 @@ async function renderApp() {
       </nav>
 
       ${activeTab === 'result' ? await renderResult() : renderInput()}
-      ${admin ? '<div class="admin-hint">관리자 승인 기능은 다음 단계에서 연결합니다.</div>' : ''}
     </main>
   `;
-
-  document.querySelector('#logout').onclick = async () => {
-    await supabase?.auth.signOut();
-    currentUser = null;
-    profile = null;
-    renderLogin();
-  };
 
   document.querySelectorAll('[data-tab]').forEach(btn => {
     btn.onclick = async () => {
@@ -409,6 +433,16 @@ function renderInput() {
             ${counter('eating-out', '외식 횟수', currentRecord?.issue?.eatingOut)}
             ${counter('late-night', '야간 외출', currentRecord?.issue?.lateNight)}
           </div>
+          ${![0,6].includes(parseDate(selectedDate).getDay()) ? `
+            <div class="field-label">평일 저녁 외출</div>
+            <div class="choice-group" role="group" aria-label="평일 저녁 외출">
+              ${['엄마','아빠','가족'].map(value => `
+                <button type="button" class="choice ${currentRecord?.issue?.weekdayEveningOuting === value ? 'selected' : ''}"
+                  data-outing-choice="${value}" aria-pressed="${currentRecord?.issue?.weekdayEveningOuting === value}">${value}</button>
+              `).join('')}
+            </div>
+            <input type="hidden" id="evening-outing" value="${esc(currentRecord?.issue?.weekdayEveningOuting || '')}" />
+          ` : ''}
           <textarea id="issue-note" rows="2" placeholder="생활 기록 메모">${esc(currentRecord?.issue?.note || '')}</textarea>
         </section>
 
@@ -459,6 +493,18 @@ function bindInput() {
     });
   });
 
+  document.querySelectorAll('[data-outing-choice]').forEach(button => {
+    button.addEventListener('click', () => {
+      const input = document.querySelector('#evening-outing');
+      input.value = input.value === button.dataset.outingChoice ? '' : button.dataset.outingChoice;
+      document.querySelectorAll('[data-outing-choice]').forEach(choice => {
+        const selected = choice.dataset.outingChoice === input.value;
+        choice.classList.toggle('selected', selected);
+        choice.setAttribute('aria-pressed', String(selected));
+      });
+    });
+  });
+
   document.querySelectorAll('[data-step]').forEach(button => {
     button.addEventListener('click', () => {
       const id = button.dataset.step;
@@ -476,6 +522,7 @@ function bindInput() {
       conflict: Number(document.querySelector('#conflict').value || 0),
       eatingOut: Number(document.querySelector('#eating-out').value || 0),
       lateNight: Number(document.querySelector('#late-night').value || 0),
+      weekdayEveningOuting: document.querySelector('#evening-outing')?.value || '',
       note: document.querySelector('#issue-note').value
     };
 
@@ -514,15 +561,19 @@ async function routeUser() {
 }
 
 async function boot() {
-  if (!supabase) return renderLogin();
-  const { data } = await supabase.auth.getSession();
-  currentUser = data.session?.user || null;
-  await routeUser();
-  supabase.auth.onAuthStateChange(async (_event, session) => {
+  // Never block opening the dashboard on a login or network request.
+  await renderDashboard();
+  if (!supabase) return;
+  try {
+    const { data } = await supabase.auth.getSession();
+    currentUser = data.session?.user || null;
+    if (currentUser) {
+      const imported = await migrateExistingRecords();
+      if (imported && activeTab === 'result') await renderApp();
+    }
+  } catch (error) { console.error('기존 기록 확인 실패', error); }
+  supabase.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user || null;
-    if (currentUser) await routeUser();
-    else renderLogin();
   });
 }
-
 boot();
